@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Astro Spectrum & Filter Viewer</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-4.1.1.min.js"></script>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Astro Spectrum & Filter Viewer</h1>
+      <p>複数スペクトル・filter・rest/observed frame・emission line・synthetic AB magnitude をブラウザ上で比較します。</p>
+    </div>
+  </header>
+
+  <main>
+    <aside class="panel controls">
+      <section>
+        <div class="section-title-row">
+          <h2>Spectra</h2>
+          <button id="addBlackbody" class="small-button" type="button">+ Blackbody</button>
+        </div>
+
+        <div class="upload-box">
+          <label>
+            Spectrum CSV(s)
+            <input id="spectrumFiles" type="file" accept=".csv,.txt,.dat" multiple />
+          </label>
+          <div class="two-col">
+            <label>
+              Default λ unit
+              <select id="uploadWaveUnit">
+                <option value="nm">nm</option>
+                <option value="angstrom">Å</option>
+                <option value="um">μm</option>
+              </select>
+            </label>
+            <label>
+              Default flux
+              <select id="uploadFluxUnit">
+                <option value="relative_flam">relative Fλ</option>
+                <option value="relative_fnu">relative Fν</option>
+                <option value="flam_cgs_a">Fλ [erg/s/cm²/Å]</option>
+                <option value="flam_cgs_nm">Fλ [erg/s/cm²/nm]</option>
+                <option value="fnu_jy">Fν [Jy]</option>
+                <option value="fnu_cgs">Fν [erg/s/cm²/Hz]</option>
+              </select>
+            </label>
+          </div>
+          <p class="help">CSV内の <code># wavelength_unit:</code>, <code># flux_unit:</code>, <code># frame:</code>, <code># redshift:</code> が優先されます。</p>
+        </div>
+
+        <div id="spectrumList" class="spectrum-list"></div>
+      </section>
+
+      <section>
+        <h2>Filters</h2>
+        <p class="help section-help">チェックで表示、色ボタンでfilterごとの色を変更できます。</p>
+        <div id="filterList" class="filter-list">
+          <p class="muted">loading...</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Display settings</h2>
+        <div class="two-col">
+          <label>
+            Flux display
+            <select id="fluxDisplay">
+              <option value="flam">Fλ</option>
+              <option value="fnu">Fν</option>
+            </select>
+          </label>
+          <label>
+            Wavelength frame
+            <select id="frameDisplay">
+              <option value="observed">Observed</option>
+              <option value="rest">Rest</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Reference spectrum for filters / lines
+          <select id="referenceSpectrum"></select>
+        </label>
+
+        <label class="checkbox-row">
+          <input id="showABMag" type="checkbox" checked />
+          Synthetic AB magnitude を表示
+        </label>
+        <label class="checkbox-row">
+          <input id="showEmissionLines" type="checkbox" />
+          Emission lines を表示
+        </label>
+        <label class="checkbox-row">
+          <input id="normalizePlot" type="checkbox" checked />
+          各スペクトルを表示用に正規化
+        </label>
+        <label class="checkbox-row">
+          <input id="logY" type="checkbox" />
+          Log flux axis
+        </label>
+
+        <button id="resetView" type="button">Reset view</button>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div id="plot"></div>
+      <div id="frameNote" class="frame-note"></div>
+      <div class="panel results">
+        <h2>Photometry / filter summary</h2>
+        <div id="summary" class="summary-grid">
+          <span class="muted">filterを選択してください。</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Filter files are loaded from <code>filters/</code>. Processing is performed locally in the browser.</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
